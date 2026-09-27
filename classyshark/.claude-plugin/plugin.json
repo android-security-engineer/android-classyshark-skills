@@ -1,0 +1,11 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "classyshark",
+  "version": "1.0.0",
+  "description": "ClassyShark binary analysis for Claude. Headless agent analyzes APK/JAR/DEX/class/ELF archives; GUI agent drives the live Swing window while a human still uses it. Both speak a JSON-over-stdio protocol.",
+  "author": {
+    "name": "cc11001100",
+    "email": "cc11001100@qq.com"
+  },
+  "license": "Apache-2.0"
+}

@@ -48,6 +48,46 @@ https://github.com/google/android-classyshark/issues
 Patches are encouraged, and may be submitted by forking this project and
 submitting a pull request through GitHub.
 
+## Claude Code marketplace install
+
+This repo is a [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugins). It
+ships two agents — **`classyshark-headless`** (pure analysis) and **`classyshark-gui`** (drives the
+live Swing window) — plus a **`get-started`** skill that tells Claude how to fetch the jar and pick
+an agent.
+
+**Install (in Claude Code, or in a terminal):**
+
+```bash
+# 1. Add this repo as a marketplace
+claude plugin marketplace add github:android-security-engineer/android-classyshark-skills
+
+# 2. Install the classyshark plugin
+claude plugin install classyshark@android-classyshark-skills
+
+# 3. Verify agents + skill are registered
+claude plugin details classyshark@android-classyshark-skills
+```
+
+Or, interactively inside Claude Code: `/plugin marketplace add github:android-security-engineer/android-classyshark-skills`, then
+`/plugin install classyshark`.
+
+Then ask Claude to analyze a binary, e.g. "analyze this apk's methods and strings". Claude will
+obtain the jar (from the [Releases](https://github.com/android-security-engineer/android-classyshark-skills/releases) /
+[RELEASE.md](./RELEASE.md)) and drive ClassyShark through its JSON stdio protocol.
+
+Marketplace layout:
+
+```
+.claude-plugin/marketplace.json   # marketplace manifest (→ plugin ./classyshark)
+classyshark/
+  .claude-plugin/plugin.json      # plugin manifest (metadata only)
+  agents/classyshark-headless.md  # auto-discovered agents
+  agents/classyshark-gui.md
+  skills/get-started/SKILL.md     # auto-discovered skill
+```
+
+Validate locally: `claude plugin validate . --strict` and `claude plugin validate classyshark --strict`.
+
 License
 =======
 

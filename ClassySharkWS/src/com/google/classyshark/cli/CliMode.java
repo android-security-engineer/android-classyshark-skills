@@ -16,9 +16,13 @@
 
 package com.google.classyshark.cli;
 
+import com.google.classyshark.agent.AgentStdioMain;
+import com.google.classyshark.agent.HeadlessStdioMain;
+import com.google.classyshark.gui.GuiMode;
 import com.google.classyshark.updater.UpdateManager;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.classyshark.silverghost.SilverGhostFacade.exportArchive;
@@ -38,6 +42,8 @@ public class CliMode {
             "    -export\t  export to file \n" +
             "    -methodcounts\t  packages with method counts \n" +
             "    -inspect  experimental prints apk analysis\n" +
+            "    -agent-stdio\t  headless agent mode (JSON over stdio)\n" +
+            "    -agent-gui-stdio  GUI + agent mode (GUI with JSON agent on stdio)\n" +
             "    -update\tupdates ClassyShark" +
             "\nwhere args is an optional classname\n";
 
@@ -45,6 +51,30 @@ public class CliMode {
     }
 
     public static void with(List<String> args) {
+        if (!args.isEmpty() && args.get(0).equalsIgnoreCase("-agent-stdio")) {
+            try {
+                HeadlessStdioMain.run(System.in, System.out);
+            } catch (Exception e) {
+                System.err.println("Agent stdio failed: " + e.getMessage());
+            }
+            return;
+        }
+
+        if (!args.isEmpty() && args.get(0).equalsIgnoreCase("-agent-gui-stdio")) {
+            List<String> guiArgs = args.size() > 1 ? new ArrayList<>(args.subList(1, args.size())) : new ArrayList<>();
+            GuiMode.with(guiArgs);
+            Thread agentThread = new Thread(() -> {
+                try {
+                    AgentStdioMain.run(System.in, System.out);
+                } catch (Exception e) {
+                    System.err.println("Agent stdio failed: " + e.getMessage());
+                }
+            }, "classyshark-agent-stdio");
+            agentThread.setDaemon(true);
+            agentThread.start();
+            return;
+        }
+
         if (args.size() < 2) {
             System.err.println("missing command line arguments " + "\n\n\n" + ERROR_MESSAGE);
             return;

@@ -26,6 +26,9 @@ import com.google.classyshark.silverghost.methodscounter.RootBuilder;
 import com.google.classyshark.silverghost.translator.Translator;
 import com.google.classyshark.silverghost.translator.TranslatorFactory;
 import com.google.classyshark.silverghost.translator.apk.ApkTranslator;
+import com.google.classyshark.silverghost.translator.apk.dashboard.ApkDashboard;
+import com.google.classyshark.silverghost.translator.apk.dashboard.JavaDependenciesInspector;
+import com.google.classyshark.silverghost.translator.apk.dashboard.manifest.ManifestInspector;
 import com.google.classyshark.silverghost.translator.dex.DexMethodsDumper;
 import com.google.classyshark.silverghost.translator.dex.DexStringsDumper;
 import java.io.File;
@@ -151,6 +154,50 @@ public class SilverGhostFacade {
             Exporter.writeArchive(apk, getAllClassNames(apk));
         } catch (Exception e) {
             System.err.println("Internal error - couldn't write file");
+        }
+    }
+
+
+    public static List<String> getClassDependencies(String className, File archiveFile) {
+        Translator translator = TranslatorFactory.createTranslator(
+                className, archiveFile, getAllClassNames(archiveFile));
+        try {
+            translator.apply();
+            return translator.getDependencies();
+        } catch (Exception e) {
+            return new LinkedList<>();
+        }
+    }
+
+    public static ApkDashboard getApkDashboard(File apkFile) {
+        ApkDashboard dashboard = new ApkDashboard(apkFile);
+        dashboard.inspect();
+        return dashboard;
+    }
+
+    public static List<String> getJavaDepsWarnings(File apkFile) {
+        List<String> classes = getAllClassNames(apkFile);
+        return new JavaDependenciesInspector(classes).getInspections();
+    }
+
+    public static List<String> getManifestIssues(File apkFile) {
+        return new ManifestInspector(apkFile).getInspections();
+    }
+
+    public static List<ContentReader.Component> getAllComponents(File archiveFile) {
+        ContentReader reader = new ContentReader(archiveFile);
+        reader.load();
+        return reader.getAllComponents();
+    }
+
+    public static String getEntryContent(String entryName, File archiveFile) {
+        Translator translator = TranslatorFactory.createTranslator(
+                entryName, archiveFile, getAllClassNames(archiveFile));
+        try {
+            translator.apply();
+            return translator.toString();
+        } catch (Exception e) {
+            return "";
         }
     }
 

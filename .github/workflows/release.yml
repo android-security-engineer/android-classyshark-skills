@@ -1,0 +1,82 @@
+name: Release
+
+# Trigger: pushing a tag like v1.0.0. The GitHub Release is created from the
+# tag and the "fat jar" (all-in-one runnable ClassyShark jar) is attached.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {} # allow manual run for testing without publishing
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The legacy ClassyShark build (apply plugin: 'java', `compile` config,
+      # flatDir third_party) needs Gradle 2.x and runs under JDK 8 only. It does
+      # not ship a usable gradlew wrapper (no gradle-wrapper.jar), so we download
+      # a pinned Gradle distribution directly.
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Set up Gradle 2.x (pinned distribution)
+        run: |
+          set -euo pipefail
+          curl -sLO https://services.gradle.org/distributions/gradle-2.2.1-bin.zip
+          unzip -q gradle-2.2.1-bin.zip
+          export GRADLE_HOME="$PWD/gradle-2.2.1"
+          echo "GRADLE_HOME=$GRADLE_HOME" >> "$GITHUB_ENV"
+          echo "$GRADLE_HOME/bin" >> "$GITHUB_PATH"
+          gradle --version
+
+      # third_party jars (asmdex-1.0, util-2.0.6, java-binutils) are required
+      # on the compile classpath but are NOT committed upstream and NOT on
+      # Maven Central. Strategy, in order of preference:
+      #   1. committed jars under third_party/ already present (fast path).
+      #   2. otherwise scripts/assemble-third-party.py downloads the official
+      #      upstream fat jar (CDN) and repackages the three libs out of it.
+      # The script self-verifies each produced jar is non-empty and fails
+      # loudly, so a release is never published half-baked.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Assemble third_party jars
+        run: python3 scripts/assemble-third-party.py
+
+      - name: Build fat jar
+        working-directory: ClassySharkWS
+        run: gradle fatJar
+
+      - name: Stage artifact
+        run: |
+          JAR=$(ls ClassySharkWS/build/libs/*-all-*.jar)
+          echo "artifact=$JAR" >> "$GITHUB_ENV"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: |
+            ## ClassyShark Agent skills — release ${{ github.ref_name }}
+
+            Auto-built from tag `${{ github.ref_name }}`.
+
+            **Run in headless agent mode:**
+            ```bash
+            java -jar ClassySharkWS-all-*.jar -agent-stdio
+            java -jar ClassySharkWS-all-*.jar -agent-gui-stdio
+            ```
+          files: |
+            ${{ env.artifact }}

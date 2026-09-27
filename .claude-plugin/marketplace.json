@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "android-classyshark-skills",
+  "description": "ClassyShark binary analysis for APK/JAR/DEX/class, exposed to Claude as installable agents (headless + GUI) over a JSON stdio protocol.",
+  "owner": {
+    "name": "cc11001100",
+    "email": "cc11001100@qq.com"
+  },
+  "plugins": [
+    {
+      "name": "classyshark",
+      "source": "./classyshark",
+      "version": "1.0.0",
+      "description": "ClassyShark binary-analysis agents: headless archive analysis and live Swing GUI control."
+    }
+  ]
+}

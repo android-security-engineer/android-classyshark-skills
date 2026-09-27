@@ -52,12 +52,13 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
+import com.google.classyshark.agent.GuiBridge;
 
 /**
  * App controller, general app structure MVM ==> Model - View - Mediator (this class)
  */
 public class ClassySharkPanel extends JPanel
-        implements ToolbarController, ViewerController, KeyListener {
+        implements ToolbarController, ViewerController, KeyListener, GuiBridge.GuiPanel {
 
     private static final boolean IS_CLASSNAME_FROM_MOUSE_CLICK = true;
     private static final boolean VIEW_TOP_CLASS = true;
@@ -66,6 +67,7 @@ public class ClassySharkPanel extends JPanel
     private JFrame parentFrame;
     private Toolbar toolbar;
     private JSplitPane jSplitPane;
+    private JTabbedPane jTabbedPane;
     private MethodsCountPanel methodsCountPanel;
     private int dividerLocation = 0;
     private IDisplayArea displayArea;
@@ -95,6 +97,13 @@ public class ClassySharkPanel extends JPanel
         parentFrame = frame;
         toolbar.setText("");
         theme.applyTo(this);
+        GuiBridge.INSTANCE.register(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        GuiBridge.INSTANCE.deregister();
     }
 
     @Override
@@ -158,6 +167,7 @@ public class ClassySharkPanel extends JPanel
         toolbar.setText("");
         displayArea.displayClassNames(silverGhost.getAllClassNames(), "");
         silverGhost.initClassNameFiltering();
+        GuiBridge.INSTANCE.notifyDisplayingClassList();
     }
 
     @Override
@@ -225,6 +235,7 @@ public class ClassySharkPanel extends JPanel
         }
         jSplitPane.getLeftComponent().setVisible(visible);
         jSplitPane.updateUI();
+        GuiBridge.INSTANCE.notifyLeftPaneVisibility(visible);
     }
 
     @Override
@@ -235,6 +246,7 @@ public class ClassySharkPanel extends JPanel
     @Override
     public void displayArchive(File binaryArchive) {
         silverGhost.setBinaryArchive(binaryArchive);
+        GuiBridge.INSTANCE.notifyArchiveOpening(binaryArchive.getAbsolutePath());
 
         if (parentFrame != null) {
             parentFrame.setTitle(silverGhost.getBinaryArchive().getName());
@@ -257,6 +269,7 @@ public class ClassySharkPanel extends JPanel
 
     @Override
     public void keyPressed(KeyEvent e) {
+        GuiBridge.INSTANCE.notifyHumanInput();
         if (!isDataLoaded) {
             openArchive();
             return;
@@ -312,7 +325,7 @@ public class ClassySharkPanel extends JPanel
         theme.applyTo(rightScrollPane);
 
         filesTree = new FilesTree(this);
-        JTabbedPane jTabbedPane = new JTabbedPane();
+        jTabbedPane = new JTabbedPane();
         JScrollPane leftScrollPane = new JScrollPane(filesTree.getJTree());
         theme.applyTo(leftScrollPane);
 
@@ -332,6 +345,8 @@ public class ClassySharkPanel extends JPanel
                     jSplitPane.setRightComponent(ringChartPanel);
                 }
                 jSplitPane.setDividerLocation(dividerLocation1);
+                GuiBridge.INSTANCE.notifyTabChanged(
+                        jTabbedPane1.getSelectedIndex() == 0 ? "classes" : "methods_count");
             }
         });
 
@@ -375,6 +390,8 @@ public class ClassySharkPanel extends JPanel
                     filesTree.fillArchive(new File("ERROR"), new ArrayList<String>(),
                             silverGhost.getComponents());
                     displayArea.displayError();
+                    GuiBridge.INSTANCE.notifyDisplayError();
+                    GuiBridge.INSTANCE.notifyArchiveLoadFailed();
                     return;
                 }
 
@@ -386,8 +403,10 @@ public class ClassySharkPanel extends JPanel
                     onSelectedClassName(className);
                 } else {
                     displayArea.displaySharkey();
+                    GuiBridge.INSTANCE.notifyDisplayingClassList();
                 }
                 isDataLoaded = true;
+                GuiBridge.INSTANCE.notifyArchiveLoaded(silverGhost.getAllClassNames());
             }
         };
 
@@ -453,19 +472,24 @@ public class ClassySharkPanel extends JPanel
                     if (clickedOnClass()) {
                         toolbar.setText(className);
                         displayArea.displayClass(displayedClassTokens, textFromTypingArea);
+                        GuiBridge.INSTANCE.notifyDisplayingClass(className, silverGhost.getCurrentClassContent());
                     } else {
                         toolbar.setText("AndroidManifest.xml");
                         displayManifestWithSpecificLine();
+                        GuiBridge.INSTANCE.notifyDisplayingClass("AndroidManifest.xml", silverGhost.getCurrentClassContent());
                     }
                 } else {
                     if (noResults()) {
                         displayArea.displayError();
+                        GuiBridge.INSTANCE.notifyDisplayError();
                     } else if (oneResult()) {
                         displayArea.displayClass(displayedClassTokens, "");
+                        GuiBridge.INSTANCE.notifyDisplayingClass(filteredClassNames.get(0), silverGhost.getCurrentClassContent());
                     } else {
                         displayArea.displaySearchResults(filteredClassNames,
                                 manifestSearchResultsTokens,
                                 textFromTypingArea);
+                        GuiBridge.INSTANCE.notifyDisplayingSearchResults(filteredClassNames, textFromTypingArea);
                     }
                 }
             }
@@ -509,4 +533,80 @@ public class ClassySharkPanel extends JPanel
 
         worker.execute();
     }
+
+    // ── GuiBridge.GuiPanel (agent GUI control) ────────────────────────────────
+
+    @Override
+    public void agentOpenArchive(File archive) {
+        javax.swing.SwingUtilities.invokeLater(() -> displayArchive(archive));
+    }
+
+    @Override
+    public void agentNavigateTo(String className) {
+        javax.swing.SwingUtilities.invokeLater(() -> onSelectedClassName(className));
+    }
+
+    @Override
+    public void agentSearch(String query) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            toolbar.setText(query);
+            onChangedTextFromTypingArea(query);
+        });
+    }
+
+    @Override
+    public void agentGoBack() {
+        javax.swing.SwingUtilities.invokeLater(() -> onGoBackPressed());
+    }
+
+    @Override
+    public void agentViewTopClass() {
+        javax.swing.SwingUtilities.invokeLater(() -> onViewTopClassPressed());
+    }
+
+    @Override
+    public void agentExport() {
+        javax.swing.SwingUtilities.invokeLater(() -> onExportButtonPressed());
+    }
+
+    @Override
+    public void agentLoadMappings(File mappingFile) {
+        javax.swing.SwingUtilities.invokeLater(() -> readMappingFile(mappingFile));
+    }
+
+    @Override
+    public void agentToggleTree(boolean visible) {
+        javax.swing.SwingUtilities.invokeLater(() -> onChangeLeftPaneVisibility(visible));
+    }
+
+    @Override
+    public void agentSetTab(String tab) {
+        if (jTabbedPane == null) return;
+        int index = "methods_count".equals(tab) ? 1 : 0;
+        final int target = index;
+        javax.swing.SwingUtilities.invokeLater(() -> jTabbedPane.setSelectedIndex(target));
+    }
+
+    @Override
+    public String agentCapturePng() {
+        java.awt.Component component = jSplitPane.getRightComponent();
+        if (component == null || component.getWidth() <= 0 || component.getHeight() <= 0) {
+            return "";
+        }
+        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(
+                component.getWidth(), component.getHeight(),
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D graphics = image.createGraphics();
+        try {
+            component.paint(graphics);
+            java.io.ByteArrayOutputStream output = new java.io.ByteArrayOutputStream();
+            javax.imageio.ImageIO.write(image, "png", output);
+            return java.util.Base64.getEncoder().encodeToString(output.toByteArray());
+        } catch (java.io.IOException e) {
+            return "";
+        } finally {
+            graphics.dispose();
+        }
+    }
+
 }

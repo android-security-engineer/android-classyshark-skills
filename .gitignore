@@ -43,3 +43,7 @@ ClassySharkWS/*_dump
 ClassySharkWS/ClassyShark*.jar
 
 ClassySharkWS/pathname
+
+# Local Claude Code agent registry (duplicated for local dev; the plugin
+# source of truth is under classyshark/agents/)
+.claude/
