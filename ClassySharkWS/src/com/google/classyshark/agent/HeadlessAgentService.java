@@ -38,8 +38,9 @@ import java.util.List;
  * {@code -agent-stdio} (headless) and can be embedded in a process that has no
  * display. GUI control commands live in {@link GuiAgentService}.</p>
  */
-public class HeadlessAgentService {
+public class HeadlessAgentService implements CommandService {
 
+    @Override
     public AgentResponse invoke(AgentRequest request) {
         String command = request.getCommand();
         try {
