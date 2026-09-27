@@ -25,3 +25,127 @@
   font-size: 0.85em;
   margin: 12px 0;
 }
+
+/* ================= 首页自定义样式 ================= */
+.cs-home-hero {
+  text-align: center;
+  padding: 56px 0 32px;
+  position: relative;
+}
+.cs-hero-badge {
+  display: inline-block;
+  font-size: 13px; font-weight: 600;
+  color: var(--cs-teal, #00c4b4);
+  background: rgba(0, 196, 180, 0.1);
+  border: 1px solid rgba(0, 196, 180, 0.35);
+  border-radius: 999px; padding: 4px 14px; margin-bottom: 18px;
+}
+.cs-hero-title {
+  font-size: 44px; line-height: 1.15; font-weight: 800; margin: 0 0 16px;
+  color: var(--vp-c-text-1);
+}
+.cs-hero-grad {
+  background: linear-gradient(120deg, #2b5fff, #00c4b4);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cs-hero-sub {
+  font-size: 17px; line-height: 1.6; max-width: 640px; margin: 0 auto 28px;
+  color: var(--vp-c-text-2);
+}
+.cs-hero-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 34px; }
+.cs-btn {
+  display: inline-block; font-size: 15px; font-weight: 600;
+  border-radius: 10px; padding: 10px 24px; transition: transform 0.2s, box-shadow 0.2s;
+}
+.cs-btn:hover { transform: translateY(-2px); }
+.cs-btn-brand {
+  color: #fff;
+  background: linear-gradient(120deg, #2b5fff, #00c4b4);
+  box-shadow: 0 6px 20px rgba(43, 95, 255, 0.35);
+}
+.cs-btn-alt {
+  color: var(--vp-c-brand-1);
+  border: 1.5px solid var(--vp-c-brand-1);
+  background: transparent;
+}
+.cs-hero-stats {
+  display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
+}
+.cs-hero-stats div { text-align: center; }
+.cs-hero-stats b {
+  display: block; font-size: 22px; font-weight: 800; color: var(--vp-c-brand-1);
+}
+.cs-hero-stats span { font-size: 13px; color: var(--vp-c-text-3); }
+
+/* 章节 */
+.cs-section { margin: 48px 0; }
+.cs-section-title {
+  font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 8px;
+}
+.cs-section-lead {
+  text-align: center; color: var(--vp-c-text-2); margin-bottom: 28px; font-size: 15px;
+}
+
+/* 痛点网格 */
+.cs-pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.cs-pain-card {
+  background: var(--vp-c-bg-soft); border-radius: 14px; padding: 22px 20px;
+  border: 1px solid var(--vp-c-divider); transition: transform 0.25s, box-shadow 0.25s;
+}
+.cs-pain-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(43,95,255,0.12); }
+.cs-pain-ic { font-size: 30px; margin-bottom: 10px; }
+.cs-pain-card h3 { font-size: 17px; font-weight: 700; margin: 0 0 8px; }
+.cs-pain-card p { font-size: 14px; color: var(--vp-c-text-2); line-height: 1.6; margin: 0; }
+
+/* 解决步骤 */
+.cs-how-steps { display: flex; flex-direction: column; gap: 14px; max-width: 760px; margin: 0 auto; }
+.cs-how-step {
+  display: flex; gap: 16px; align-items: flex-start;
+  background: var(--vp-c-bg-soft); border-radius: 12px; padding: 18px 20px;
+}
+.cs-how-num {
+  flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: #fff;
+  background: linear-gradient(120deg, #2b5fff, #00c4b4);
+}
+.cs-how-body h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+.cs-how-body p { font-size: 14px; color: var(--vp-c-text-2); line-height: 1.6; margin: 0; }
+
+/* 证明网格 */
+.cs-proof-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.cs-proof-card {
+  background: linear-gradient(160deg, rgba(43,95,255,0.08), rgba(0,196,180,0.06));
+  border: 1px solid rgba(43,95,255,0.2); border-radius: 14px;
+  text-align: center; padding: 24px 16px;
+  animation: csGlow 3s ease-in-out infinite alternate;
+}
+.cs-proof-value { font-size: 34px; font-weight: 800; color: var(--vp-c-brand-1); line-height: 1; }
+.cs-proof-value.cs-proof-warn { color: #ff4d6a; }
+.cs-proof-label { font-size: 13px; color: var(--vp-c-text-2); margin-top: 8px; }
+.cs-proof-note { text-align: center; color: var(--vp-c-text-3); font-size: 13px; margin-top: 14px; }
+
+/* 能力网格 */
+.cs-cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.cs-cap-card {
+  background: var(--vp-c-bg-soft); border-radius: 14px; padding: 22px 20px;
+  border: 1px solid var(--vp-c-divider); text-align: center;
+}
+.cs-cap-ic { font-size: 30px; margin-bottom: 10px; }
+.cs-cap-card h3 { font-size: 17px; font-weight: 700; margin: 0 0 8px; }
+.cs-cap-card p { font-size: 14px; color: var(--vp-c-text-2); line-height: 1.6; margin: 0 0 12px; }
+.cs-cap-card a { font-size: 14px; font-weight: 600; color: var(--vp-c-brand-1); }
+.cs-cap-card code {
+  font-size: 12px; background: var(--vp-code-bg); border-radius: 4px; padding: 1px 5px;
+}
+
+@keyframes csGlow {
+  from { box-shadow: 0 0 10px rgba(43,95,255,0.15); }
+  to { box-shadow: 0 0 26px rgba(43,95,255,0.3); }
+}
+
+@media (max-width: 900px) {
+  .cs-hero-title { font-size: 32px; }
+  .cs-pain-grid, .cs-proof-grid, .cs-cap-grid { grid-template-columns: 1fr; }
+  .cs-hero-stats { gap: 24px; }
+}
