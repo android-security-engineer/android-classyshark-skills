@@ -140,18 +140,18 @@ const libsShown = ref(12)
   <div id="cs-home-demo" class="cs-demo" :class="{ 'cs-visible': visible }">
     <div class="cs-demo-header">
       <div class="cs-demo-tabs">
-        <span class="cs-tab" :class="{ active: phase === 0 }">① 问题</span>
-        <span class="cs-tab" :class="{ active: phase === 1 }">② 解决</span>
-        <span class="cs-tab" :class="{ active: phase === 2 }">③ 结果</span>
+        <span class="cs-tab" :class="{ active: phase === 0 }">① 看不懂</span>
+        <span class="cs-tab" :class="{ active: phase === 1 }">② 帮你看懂</span>
+        <span class="cs-tab" :class="{ active: phase === 2 }">③ 看懂了</span>
       </div>
-      <span class="cs-demo-label">真实样本：{{ DEMO.name }} · {{ DEMO.size }} · 用 ClassyShark 实际分析</span>
+      <span class="cs-demo-label">⬆ 上面就是一个真实的 24MB App 装进 ClassyShark 后的分析过程</span>
     </div>
 
     <div class="cs-stage">
       <!-- ================= 幕 1：问题 ================= -->
       <transition name="fade">
         <div v-if="phase === 0" class="cs-act cs-act-problem">
-          <div class="cs-question-big">拿到一个 APK，里面到底有什么？</div>
+          <div class="cs-question-big">手里一个 App，你根本不知道它里面装了什么</div>
           <div class="cs-problem-row">
             <div class="cs-apk-chip cs-float-in">
               <span class="cs-apk-icon">📦</span>
@@ -170,15 +170,15 @@ const libsShown = ref(12)
           <div class="cs-problem-cards">
             <div class="cs-card-mini cs-count-up">
               <b>{{ formatNum(DEMO.totalClasses) }}</b>
-              <span>类？方法？</span>
+              <span>多少功能？</span>
             </div>
             <div class="cs-card-mini cs-warn">
-              <b>65,536</b>
-              <span>dex 方法上限</span>
+              <b>逼近上限</b>
+              <span>代码量太大了</span>
             </div>
             <div class="cs-card-mini">
               <b>{{ DEMO.nativeLibCount }}+</b>
-              <span>原生库？</span>
+              <span>用了谁的代码？</span>
             </div>
           </div>
         </div>
@@ -187,35 +187,35 @@ const libsShown = ref(12)
       <!-- ================= 幕 2：解决 ================= -->
       <transition name="fade">
         <div v-if="phase === 1" class="cs-act cs-act-solve">
-          <div class="cs-solve-title">ClassyShark 帮你拆开它</div>
+          <div class="cs-solve-title">就像安检扫描 —— 逐层帮你把里面看透</div>
           <div class="cs-solve-pipeline">
             <div class="cs-pipe-step cs-pipe-1">
-              <div class="cs-pipe-ic">🔓</div>
-              <div class="cs-pipe-name">解包 APK</div>
+              <div class="cs-pipe-ic">📦</div>
+              <div class="cs-pipe-name">收下 App</div>
             </div>
             <div class="cs-pipe-flow cs-flow-1"></div>
             <div class="cs-pipe-step cs-pipe-2">
-              <div class="cs-pipe-ic">🧬</div>
-              <div class="cs-pipe-name">解析 dex<br/><small>3 个 dex 逐一拆解</small></div>
+              <div class="cs-pipe-ic">🔍</div>
+              <div class="cs-pipe-name">拆包扫描<br/><small>把压缩包摊开</small></div>
             </div>
             <div class="cs-pipe-flow cs-flow-2"></div>
             <div class="cs-pipe-step cs-pipe-3">
               <div class="cs-pipe-ic">🗂️</div>
-              <div class="cs-pipe-name">还原类结构<br/><small>{{ formatNum(DEMO.totalClasses) }} 个类</small></div>
+              <div class="cs-pipe-name">盘点代码<br/><small>{{ formatNum(DEMO.totalClasses) }} 个功能</small></div>
             </div>
             <div class="cs-pipe-flow cs-flow-3"></div>
             <div class="cs-pipe-step cs-pipe-4">
               <div class="cs-pipe-ic">📡</div>
-              <div class="cs-pipe-name">扫 Native 库<br/><small>{{ DEMO.nativeLibCount }} 个 .so</small></div>
+              <div class="cs-pipe-name">识别组件<br/><small>{{ DEMO.nativeLibCount }} 家第三方</small></div>
             </div>
             <div class="cs-pipe-flow cs-flow-4"></div>
             <div class="cs-pipe-step cs-pipe-5">
-              <div class="cs-pipe-ic">📋</div>
-              <div class="cs-pipe-name">检查 Manifest<br/><small>{{ DEMO.manifestIssueCount }} 项风险</small></div>
+              <div class="cs-pipe-ic">⚠️</div>
+              <div class="cs-pipe-name">风险体检<br/><small>{{ DEMO.manifestIssueCount }} 处隐患</small></div>
             </div>
           </div>
           <div class="cs-solve-banner cs-fade-late">
-            <span class="cs-spark">✨</span> 秒级完成 —— 无需源码、无需反编译环境，一个 jar 全搞定
+            <span class="cs-spark">✨</span> 不用源码、不用懂技术 —— 放进去，几秒就出结果
           </div>
         </div>
       </transition>
@@ -224,13 +224,13 @@ const libsShown = ref(12)
       <transition name="fade">
         <div v-if="phase === 2" class="cs-act cs-act-result">
           <div class="cs-result-head">
-            <div class="cs-result-title">一眼看透：{{ DEMO.name }}</div>
+            <div class="cs-result-title">体检报告：{{ DEMO.name }}</div>
           </div>
 
           <div class="cs-result-grid">
             <!-- 左侧：方法数环形图 -->
             <div class="cs-result-panel cs-reveal-1">
-              <div class="cs-panel-title">📊 方法数（已逼近 65,536 红线）</div>
+              <div class="cs-panel-title">📊 代码量 · 已逼近容量红线</div>
               <div class="cs-donut-wrap">
             <svg viewBox="0 0 200 200" class="cs-donut">
               <circle class="cs-donut-bg" cx="100" cy="100" r="80" fill="none" stroke-width="22" />
@@ -246,7 +246,7 @@ const libsShown = ref(12)
                   <span>方法总数</span>
                 </div>
               </div>
-              <div class="cs-legend">
+                <div class="cs-legend">
                 <div v-for="(d, i) in DEMO.dexes" :key="'l'+d.name" class="cs-legend-item">
                   <span class="cs-legend-dot" :class="`cs-dot-${i}`"></span>
                   <span>{{ d.name }}</span>
@@ -254,7 +254,7 @@ const libsShown = ref(12)
                 </div>
                 <div class="cs-limit-line">
                   <span class="cs-legend-dot cs-dot-limit"></span>
-                  <span>dex 方法上限</span>
+                  <span>Android 单包容量红线</span>
                   <b>65,536</b>
                 </div>
               </div>
@@ -262,7 +262,7 @@ const libsShown = ref(12)
 
             <!-- 中间：Native 库 -->
             <div class="cs-result-panel cs-reveal-2">
-              <div class="cs-panel-title">🧩 Native 库（{{ DEMO.nativeLibCount }} 个）</div>
+              <div class="cs-panel-title">🧩 用到的第三方组件（{{ DEMO.nativeLibCount }} 家）</div>
               <div class="cs-lib-cloud">
                 <span v-for="lib in DEMO.nativeLibs.slice(0, libsShown)" :key="lib" class="cs-lib-chip">
                   {{ lib }}
@@ -273,25 +273,25 @@ const libsShown = ref(12)
                 <span class="cs-warn-ic">⚠️</span>
                 <span>{{ DEMO.nativeErrors[0] }}</span>
               </div>
-              <div class="cs-native-verdict">含腾讯 Bugly、MMKV、字节 pgl 等 SDK</div>
+              <div class="cs-native-verdict">认出腾讯、字节等厂商的成熟组件</div>
             </div>
 
             <!-- 右侧：Manifest 风险 -->
             <div class="cs-result-panel cs-reveal-3">
-              <div class="cs-panel-title">🛡️ Manifest 风险（{{ DEMO.manifestIssueCount }} 项）</div>
+              <div class="cs-panel-title">🛡️ 安全隐患（{{ DEMO.manifestIssueCount }} 处）</div>
               <ul class="cs-risk-list">
                 <li v-for="issue in DEMO.manifestIssues" :key="issue">
                   <span class="cs-risk-ic">🔔</span>
                   <span>{{ issue }}</span>
                 </li>
               </ul>
-              <div class="cs-risk-note">隐式广播接收器可能被外部应用触发</div>
+              <div class="cs-risk-note">这些功能可能在 App 后台悄悄被触发</div>
             </div>
           </div>
 
           <!-- 底部：源码反编译 -->
           <div class="cs-source-panel cs-reveal-4">
-            <div class="cs-panel-title">🪄 反编译源码预览 —— <span class="cs-mono">com.tencent.mmkv.MMKV</span></div>
+            <div class="cs-panel-title">🪄 甚至能把代码还原给你看 —— <span class="cs-mono">com.tencent.mmkv.MMKV</span></div>
             <pre class="cs-source"><code><span class="tok-kw">package</span> com.tencent.mmkv;
 <span class="tok-kw">import</span> android.content.Context;
 <span class="tok-kw">import</span> android.content.SharedPreferences;
