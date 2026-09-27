@@ -34,18 +34,21 @@ UPSTREAM = "https://github.com/google/android-classyshark/releases/download/8.2/
 
 # package root (inside a jar, with trailing '/') -> target third_party jar name
 PACKAGE_ROOTS = {
-    "org/objectweb/asmdex/": "asmdex-1.0.jar",
-    "com/jawi/":             "java-binutils.jar",
-    "net/jawi/":             "java-binutils.jar",
-    "org/jawi/":             "java-binutils.jar",
+    "org/ow2/asmdex/":        "asmdex-1.0.jar",      # asmdex decompiler (new package)
+    "org/objectweb/asmdex/":  "asmdex-1.0.jar",      # asmdex decompiler (old package, pre-2014)
+    "nl/lxtreme/":            "java-binutils.jar",   # lxtreme java-binutils (ELF reader)
     # everything else that is neither ClassyShark nor Maven-Central is util
 }
 
 MAVEN_CENTRAL_ROOTS = {
-    "org/ow2/asm/", "org/smali/", "org/apache/bcel/",
-    "com/google/gson/", "com/google/guava/", "com/squareup/",
-    "org/jetbrains/", "org/codehaus/mojo/", "org/slf4j/",
-    "okhttp3/", "okio/", "retrofit2/", "org/intellij/",
+    # direct build.gradle deps
+    "org/ow2/asm/", "org/objectweb/asm/", "org/smali/", "org/apache/bcel/",
+    "org/jf/", "com/google/gson/", "com/google/guava/", "com/squareup/",
+    "okhttp3/", "okio/", "retrofit2/",
+    # transitive deps of guava / okhttp that ship in the upstream fat jar
+    "com/google/common/", "com/google/errorprone/", "com/google/j2objc/",
+    "com/google/thirdparty/", "org/checkerframework/", "org/codehaus/mojo/",
+    "org/jetbrains/", "org/intellij/", "org/slf4j/",
 }
 APP_ROOT = "com/google/classyshark/"
 
